@@ -1,10 +1,10 @@
 from zjson import AsyncClient
 
-app = AsyncClient("file.json")
+db = AsyncClient("file.json")
 
 async def main():
-    # await app.set("hi", 1)
-    print([key async for key in app.keys()])
-    print(app.path)
+    # await db.set("hi", 1)
+    print([key async for key in db.keys()])
+    print(db.path)
 
-app.run(main())
+db.run(main())
