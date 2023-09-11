@@ -1,0 +1,4 @@
+
+
+class FileAlreadyConnected(Exception):
+    pass
