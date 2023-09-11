@@ -1,6 +1,6 @@
 <p align="center">
-    <a href="https://github.com/">
-        <img src="https://dev-zaiddev.pantheonsite.io/zaid/files/AgACAgIAAxkBAAILyWT_j6PAbt8P3F1JiqznohMs.jpg" alt="AioJson" width="128">
+    <a href="https://github.com/x72x/zjson/">
+        <img src="https://dev-zaiddev.pantheonsite.io/zaid/files/AgACAgIAAxkBAAILyWT_j6PAbt8P3F1JiqznohMs.jpg" alt="zjson" width="256">
     </a>
     <br>
     <b>Json Database full async</b>
@@ -47,6 +47,6 @@ db.run(main())
 pip3 install -U zjson
 ```
 
-### Resources
+### Community
 
 - Join the telegram channel: https://t.me/Y88F8
