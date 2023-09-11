@@ -5,7 +5,7 @@
     <br>
     <b>Json Database full async</b>
     <br>
-    <a href="https://github.com">
+    <a href="https://github.com/x72x/zjson/tree/main/examples">
         Examples
     </a>
     •
