@@ -18,12 +18,28 @@ _lock = asyncio.Lock()
 
 
 class AsyncClient(Object):
-    def __init__(self, name: str, directory: str = None, indent = 4) -> None:
+    def __init__(self, name: str, directory: str = None, indent = 4, auto_clean_and_backup: bool = None) -> None:
+        """
+        Args:
+
+            name (str): Name of database file
+
+            directory (str, optional): Path to work dir. Defaults to None.
+
+            indent (int, optional): indent in file dump. Defaults to 4.
+
+            auto_clean_and_backup (bool, optional): Auto remove expired keys and create data backup into file. Defaults to None.
+
+
+        Raises:
+            zjson.errors.FileAlreadyConnected: When you use same file more than one time
+        """
         super().__init__()
         self.name = name
         self.directory = directory
         self.path = self.directory+"/"+self.name if self.directory else self.name
         self.indent = indent
+        self.auto_clean_and_backup = auto_clean_and_backup
 
         if self.path in _names:
             raise FileAlreadyConnected(f"File [ {self.path} ] Already Connected")
@@ -31,6 +47,8 @@ class AsyncClient(Object):
         self._repair()
         if self.path not in _names:
             _names.append(self.path)
+
+        if self.auto_clean_and_backup:
             try:
                 loop = asyncio.get_event_loop()
             except RuntimeError:
@@ -63,6 +81,10 @@ class AsyncClient(Object):
                 f.write(json.dumps(data, indent=self.indent, ensure_ascii=False))
 
     def data_from_backup(self, path: str):
+        """
+        Args:
+            path (str): Path for output file
+        """
         with open(path, 'r') as f:
             data = f.read()
         with open(self.path, 'w+') as f:
@@ -88,6 +110,18 @@ class AsyncClient(Object):
         value: Union["str", "int", "list", "dict", "float", "bool", "None", "set"],
         expire: "int" = None
     ) -> Any:
+        """
+        Args:
+            key (str): Key name .
+            value (Union[&quot;str&quot;, &quot;int&quot;, &quot;list&quot;, &quot;dict&quot;, &quot;float&quot;, &quot;bool&quot;, &quot;None&quot;, &quot;set&quot;]): Value .
+            expire (int, optional): This key will be expired after specific seconds. Defaults to None.
+
+        Raises:
+            TypeError: When value type not supported
+
+        Returns:
+            Any: Key data
+        """
         if (value).__class__.__name__ not in {"str", "int", "list", "dict", "float", "bool", "NoneType", "set"}:
             raise TypeError(f"Unsopported type [ {value.__class__.__name__} ]")
         if (value).__class__.__name__ == "set": value = [i for i in value]
@@ -110,6 +144,12 @@ class AsyncClient(Object):
         self,
         key: "str"
     ):
+        """
+        Args:
+            key (str): Key Name
+        Returns:
+            Any: Value of the key or NoneType
+        """
         data = await self._read()
         all = data["all"]
         expires = data["expires"]
@@ -118,6 +158,7 @@ class AsyncClient(Object):
         elif expires.get(key, None) is not None:
             # return data["expires"][key]["value"]
             if datetime.datetime.now() > datetime.datetime.fromtimestamp(data["expires"][key]["expire_stamp"]):
+                del data["expires"][key]
                 return None
             else:
                 return data["expires"][key]["value"]
@@ -128,6 +169,13 @@ class AsyncClient(Object):
         self,
         key: "str"
     ):
+        """
+        Args:
+            key (str): Key name
+
+        Returns:
+            float: time in float to expire the key or None if the key is not expiring key
+        """
         data = await self._read()
         expires = data["expires"]
         if expires.get(key, None) is not None:
@@ -140,6 +188,10 @@ class AsyncClient(Object):
         self,
         key: "str"
     ):
+        """
+        Args:
+            key (str): Key name
+        """
         data = await self._read()
         all = data.get("all")
         expires = data.get("expires")
@@ -158,6 +210,13 @@ class AsyncClient(Object):
         return True
 
     async def keys(self, pattern: str = None, limit: int = 0) -> AsyncGenerator["str", None]:
+        """
+        Args:
+            pattern (str): regex patern
+            limit (int): keys limit
+        Yields:
+            str: Name of the key
+        """
         data = await self._read()
         all = data.get("all")
         expires = data.get("expires")
@@ -182,6 +241,14 @@ class AsyncClient(Object):
                     yield i
 
     async def get_backup(self, file_name: str = None) -> str:
+        """_summary_
+
+        Args:
+            file_name (str, optional): Output of the backup file. Defaults to None.
+
+        Returns:
+            str: file path
+        """
         file_name = file_name if file_name else self.path+"-backup"
         data = await self._read()
         async with aiofiles.open(file_name, 'w+') as f:
@@ -189,6 +256,12 @@ class AsyncClient(Object):
         return file_name
 
     async def sleep(self, _t: Union["int", "float"]):
+        """
+        Args:
+            _t (Union[&quot;int&quot;, &quot;float&quot;]): Time to sleep
+
+        same as &quot;await asyncio.sleep()&quot;
+        """
         await asyncio.sleep(_t)
 
 
