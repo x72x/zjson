@@ -9,6 +9,10 @@
         Examples
     </a>
     ~
+    <a href="https://pypi.org/project/zjson/">
+        PyPi
+    </a>
+    ~
     <a href="https://t.me/Y88F8">
         News
     </a>
