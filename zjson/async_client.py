@@ -92,13 +92,12 @@ class AsyncClient(Object):
 
 
     async def _read(self) -> dict:
+        if _cache:
+            return _cache["cache"]
         async with aiofiles.open(self.path, 'r', encoding='utf-8', errors='ignore') as f:
-            if _cache:
-                return _cache["cache"]
-            else:
-                data = json.loads(await f.read())
-                _cache["cache"]=data
-                return data
+            data = json.loads(await f.read())
+            _cache["cache"]=data
+            return data
 
     async def _update(self, data: dict):
         async with aiofiles.open(self.path, 'w+', encoding='utf-8', errors='ignore') as f:
