@@ -38,11 +38,10 @@ async def main():
         value=[1, 2, 3],
         expire=10 # expire after 10 seconds
     )
-    await db.sleep(10)
+    await db.sleep(10) # to best result use "await db.sleep(await db.ttl("key2"))"
     print(await db.get("key2")) # None
 
 db.run(main())
-
 ```
 
 ### Installing
