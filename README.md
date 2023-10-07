@@ -18,6 +18,9 @@
     </a>
 </p>
 
+## Badges
+- [![Downloads](https://static.pepy.tech/badge/zjson)](https://pepy.tech/project/zjson)
+
 ## ZJson
 
 > Example
